@@ -28,6 +28,20 @@ ChatterBox.prototype.fetch = function() {
     });
 };
 
+ChatterBox.prototype.clearMessages = function() {
+  $('#chats').html('');
+};
+
+ChatterBox.prototype.addMessage = function(message) {
+  var $message = $('<div class="message"></div>');
+  var $username = $('<span class="username"></span>');
+  var $messageText = $('<span class="text"></span>');
+  $username.text(message.username);
+  $messageText.text(message.text);
+  $message.append($username).append($messageText);
+  $('#chats').append($message);
+};
+
 
 $(document).ready(function() {
   window.app = new ChatterBox();
