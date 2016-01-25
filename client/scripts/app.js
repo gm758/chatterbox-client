@@ -1,9 +1,14 @@
 var ChatterBox = function() {
-
+  this.friendList = [];
 };
 
 ChatterBox.prototype.init = function() {
-
+  var app = this;
+  // set up username click to add friend
+  $('body').on('click', '.username', function() {
+    var friendName = $(this).text();
+    app.addFriend(friendName);
+  });
 };
 
 ChatterBox.prototype.send = function(message) {
@@ -49,7 +54,12 @@ ChatterBox.prototype.addRoom = function(roomName) {
   $('#roomSelect').append($option);
 };
 
+ChatterBox.prototype.addFriend = function(username) {
+
+};
+
 $(document).ready(function() {
   window.app = new ChatterBox();
+  app.init();
 
 });
