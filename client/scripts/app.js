@@ -21,6 +21,13 @@ ChatterBox.prototype.send = function(message) {
   });
 };
 
+ChatterBox.prototype.fetch = function() {
+    $.ajax({
+      url: undefined,
+      type: 'GET'
+    });
+};
+
 
 $(document).ready(function() {
   window.app = new ChatterBox();
