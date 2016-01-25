@@ -14,6 +14,8 @@ var ChatterBox = function(username) {
   this.friendList = [];
   this.username = username || 'anon';
   this.currentRoom = 'lobby';
+  this.messages = [];
+  this.rooms = [];
 };
 
 ChatterBox.prototype.init = function() {
@@ -28,6 +30,8 @@ ChatterBox.prototype.init = function() {
     event.preventDefault();
     app.handleSubmit($('#message').val());
   });
+
+  this.fetch();
 };
 
 ChatterBox.prototype.send = function(message) {
@@ -46,9 +50,18 @@ ChatterBox.prototype.send = function(message) {
 };
 
 ChatterBox.prototype.fetch = function() {
+    var app = this;
     $.ajax({
-      url: undefined,
-      type: 'GET'
+      url: 'https://api.parse.com/1/classes/chatterbox',
+      type: 'GET',
+      success : function(data) {
+        app.messages = data.results;
+        app.rooms = _.groupBy(app.messages, 'roomname');
+        console.log(app.rooms);
+        for (var room in app.rooms) {
+          app.addRoom(room);
+        }
+      }
     });
 };
 
