@@ -42,6 +42,12 @@ ChatterBox.prototype.addMessage = function(message) {
   $('#chats').append($message);
 };
 
+ChatterBox.prototype.addRoom = function(roomName) {
+  var $option = $('<option></option>');
+  $option.text(roomName);
+  $option.val(roomName);
+  $('#roomSelect').append($option);
+};
 
 $(document).ready(function() {
   window.app = new ChatterBox();
