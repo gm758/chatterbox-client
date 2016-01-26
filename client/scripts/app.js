@@ -11,7 +11,7 @@ window.getQueryVariable = function(variable)
 
 
 var ChatterBox = function(username) {
-  this.friendList = [];
+  this.friends = {};
   this.username = username || 'anon';
   this.currentRoom = 'lobby';
   this.messages = [];
@@ -57,7 +57,7 @@ ChatterBox.prototype.send = function(message) {
   });
 };
 
-ChatterBox.prototype.fetch = function(cb) {
+ChatterBox.prototype.fetch = function(cb) { //TO DO: Optimize fetch to only call room data
     var app = this;
     $.ajax({
       url: 'https://api.parse.com/1/classes/chatterbox',
@@ -108,11 +108,12 @@ ChatterBox.prototype.addRoom = function(roomName) {
 };
 
 ChatterBox.prototype.addFriend = function(username) {
-
+  if (!(username in this.friends)) {
+    this.friends[username] = true;
+  }
 };
 
 ChatterBox.prototype.handleSubmit = function(message) {
-  console.log('handleSubmit');
   var messageObj = {
     username: this.username,
     text: message,
