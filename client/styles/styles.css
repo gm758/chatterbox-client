@@ -25,3 +25,15 @@ a:hover {
   padding: 0.5em;
   border-bottom: 1px solid #CCC;
 }
+
+#add-room, .dropdown {
+  display:inline-block;
+}
+
+#add-room {
+  display:none;
+}
+
+#message {
+  margin-bottom: 0.5em;
+}

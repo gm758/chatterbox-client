@@ -50,7 +50,7 @@ ChatterBox.prototype.init = function() {
     app.currentRoom = $(this).text();
     app.currentFriend = null;
     if (app.currentRoom === 'add a room') {
-      $('#add-room').fadeIn();
+      $('#add-room').fadeIn().css('display','inline-block');
     } else {
       $('.roomName').text("room: " + app.currentRoom);
       app.fetch();
