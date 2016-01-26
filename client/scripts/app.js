@@ -21,12 +21,13 @@ var ChatterBox = function(username) {
 
 ChatterBox.prototype.init = function() {
   var app = this;
-  // set up username click to add friend
+  // click friends names to add to friend list
   $('body').on('click', '.username', function() {
     app.addFriend($(this).text());
     
   });
 
+  //submit new room for creation
   $('body').on('submit', '#add-room', function(e) {
     e.preventDefault();
     app.addNewRoom($('#new-room').val());
@@ -35,20 +36,31 @@ ChatterBox.prototype.init = function() {
 
   });
 
+  //submit new message to post to server
   $('#send').on('submit', function(e) {
     e.preventDefault();
     app.handleSubmit($('#message').val());
     $('#message').val('');
   });
 
+  //select room whose message to view
   $('#roomSelect').on('change', function() {
     app.currentRoom = $(this).val();
+    app.currentFriend = null;
     if (app.currentRoom === 'addRoom') {
       $('#add-room').fadeIn();
     } else {
       $('.roomName').text("room: " + app.currentRoom);
       app.fetch();
     }
+  });
+
+  //select friend to view messages of
+  $('#friendSelect').on('change', function() {
+    app.currentFriend = $(this).val();
+    
+    $('.roomName').text("friend: " + app.currentFriend);
+    app.fetch();
   });
   
 
@@ -90,8 +102,7 @@ ChatterBox.prototype.fetch = function() { //TO DO: Optimize fetch to only call r
     var where = {};
     if (this.currentFriend) {
       where.username = this.currentFriend;
-    }
-    if (this.currentRoom) {
+    } else if (this.currentRoom) {
       where.roomname = this.currentRoom;
     }
 
@@ -99,15 +110,15 @@ ChatterBox.prototype.fetch = function() { //TO DO: Optimize fetch to only call r
       url: 'https://api.parse.com/1/classes/chatterbox',
       type: 'GET',
       data: {
+        "limit":1000,
         "order":"-updatedAt",
         'where': where
       },
       success : function(data) {
         app.messages = data.results;
-        app.rooms = _.groupBy(app.messages, 'roomname');
         app.clearMessages();
-        var messagesInRoom = app.rooms[app.currentRoom];
-        _.each(messagesInRoom, function(message) {
+        // var messagesInRoom = app.rooms[app.currentRoom];
+        _.each(app.messages, function(message) {
           app.addMessage(message);
         });
 
