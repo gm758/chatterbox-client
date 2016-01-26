@@ -1,12 +1,14 @@
 window.getQueryVariable = function(variable)
 {
-       var query = window.location.search.substring(1);
-       var vars = query.split("&");
-       for (var i=0;i<vars.length;i++) {
-               var pair = vars[i].split("=");
-               if(pair[0] == variable){return pair[1];}
-       }
-       return(false);
+  var query = window.location.search.substring(1);
+  var vars = query.split("&");
+  for (var i=0;i<vars.length;i++) {
+    var pair = vars[i].split("=");
+    if(pair[0] == variable){
+      return pair[1];
+    }
+  }
+  return false;
 };
 
 
@@ -157,6 +159,9 @@ ChatterBox.prototype.addMessage = function(message) {
   var $time = $('<span class="time"></span>');
   $username.text(message.username);
   $messageText.text(message.text);
+  if (message.username in this.friends) {
+    $messageText.addClass('friended');
+  }
   var timeText = moment(message.updatedAt, moment.ISO_8601).fromNow();
   //console.log(timeText);
   $time.text(timeText);

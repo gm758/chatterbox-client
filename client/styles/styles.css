@@ -71,8 +71,16 @@ form input[type=text] {
     cursor: pointer;
     color: #0086b3;
 }
+
+.chat .friended {
+    font-weight: 800;
+}
+
 .username:hover {
-    color:lightgreen;
+    color:#31a354;
+}
+.username:hover::before{
+    content:'+ ';
 }
 
 .chat .time {
@@ -102,6 +110,10 @@ form input[type=text] {
     margin-top: 1em;
     font-size: 1.5em; 
 }
+
 #add-room {
     display: none;
 }
+
+
+
