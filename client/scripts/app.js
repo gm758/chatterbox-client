@@ -127,6 +127,8 @@ $(document).ready(function() {
   window.app = new ChatterBox(getQueryVariable('username'));
   app.init();
 
+  setInterval(app.fetch.bind(app), 5000);
+
 });
 
 
