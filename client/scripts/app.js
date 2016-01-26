@@ -31,6 +31,11 @@ ChatterBox.prototype.init = function() {
     app.handleSubmit($('#message').val());
   });
 
+  $('#roomSelect').on('change', function() {
+    app.currentRoom = $(this).val();
+    app.fetch();
+  });
+
   this.fetch();
 };
 
@@ -49,7 +54,7 @@ ChatterBox.prototype.send = function(message) {
   });
 };
 
-ChatterBox.prototype.fetch = function() {
+ChatterBox.prototype.fetch = function(cb) {
     var app = this;
     $.ajax({
       url: 'https://api.parse.com/1/classes/chatterbox',
@@ -57,10 +62,15 @@ ChatterBox.prototype.fetch = function() {
       success : function(data) {
         app.messages = data.results;
         app.rooms = _.groupBy(app.messages, 'roomname');
-        console.log(app.rooms);
+        $('#roomSelect').html('');
         for (var room in app.rooms) {
           app.addRoom(room);
         }
+        app.clearMessages();
+        var messagesInRoom = app.rooms[app.currentRoom];
+        _.each(messagesInRoom, function(message) {
+          app.addMessage(message);
+        });
       }
     });
 };
@@ -70,12 +80,16 @@ ChatterBox.prototype.clearMessages = function() {
 };
 
 ChatterBox.prototype.addMessage = function(message) {
-  var $message = $('<div class="message"></div>');
+  var $message = $('<div class="chat"></div>');
   var $username = $('<span class="username"></span>');
   var $messageText = $('<span class="text"></span>');
+  var $time = $('<span class="time"></span>');
   $username.text(message.username);
   $messageText.text(message.text);
-  $message.append($username).append($messageText);
+  var timeText = moment(message.updatedAt, moment.ISO_8601).fromNow();
+  //console.log(timeText);
+  $time.text(timeText);
+  $message.append($username).append($messageText).append($time);
   $('#chats').append($message);
 };
 
