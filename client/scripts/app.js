@@ -18,7 +18,6 @@ var ChatterBox = function(username) {
   this.username = username || 'anon';
   this.currentRoom = 'lobby';
   this.messages = [];
-  this.rooms = [];
 };
 
 ChatterBox.prototype.init = function() {
@@ -80,72 +79,74 @@ ChatterBox.prototype.addNewRoom = function(roomName) {
   this.send(welcomeMessage);
 };
 
+ChatterBox.prototype.request = function(requestType, data, successCb) {
+  var req = {
+    url: 'https://api.parse.com/1/classes/chatterbox',
+    type: requestType,
+    data: data,
+    success: successCb,
+    error: function () {
+      console.error('chatterbox: ajax request failed');
+    }
+  };
+  $.ajax(req);
+};
+
 
 ChatterBox.prototype.send = function(message) {
   var app = this;
-  $.ajax({
-    url: 'https://api.parse.com/1/classes/chatterbox',
-    type: 'POST',
-    data: JSON.stringify(message),
-    contentType: 'application/json',
-    success: function (data) {
-      console.log('chatterbox: Message sent');
-      app.fetch();
-    },
-    error: function (data) {
-      console.error('chatterbox: Failed to send message');
-    }
-  });
+  var data = JSON.stringify(message);
+  var success = function (data) {
+    console.log('chatterbox: Message sent');
+    app.fetch();
+  };
+
+  this.request('POST', data, success);
+
 };
 
 ChatterBox.prototype.fetch = function() { //TO DO: Optimize fetch to only call room data
-    this.fetchRooms();
-    var app = this;
-    var where = {};
-    if (this.currentFriend) {
-      where.username = this.currentFriend;
-    } else if (this.currentRoom) {
-      where.roomname = this.currentRoom;
-    }
+  this.fetchRooms();
+  var app = this;
+  var where = {};
+  if (this.currentFriend) {
+    where.username = this.currentFriend;
+  } else if (this.currentRoom) {
+    where.roomname = this.currentRoom;
+  }
 
-    $.ajax({
-      url: 'https://api.parse.com/1/classes/chatterbox',
-      type: 'GET',
-      data: {
-        "limit":1000,
-        "order":"-updatedAt",
-        'where': where
-      },
-      success : function(data) {
-        app.messages = data.results;
-        app.clearMessages();
-        // var messagesInRoom = app.rooms[app.currentRoom];
-        _.each(app.messages, function(message) {
-          app.addMessage(message);
-        });
-
-      }
+  var data = {
+    "limit":1000,
+    "order":"-updatedAt",
+    'where': where
+  };
+  var success = function(data) {
+    app.messages = data.results;
+    app.clearMessages();
+    _.each(app.messages, function(message) {
+      app.addMessage(message);
     });
+  };
+
+  this.request('GET', data, success);
 };
 
 ChatterBox.prototype.fetchRooms = function() { //TO DO: Optimize fetch to only call room data
-    var app = this;
-    $.ajax({
-      url: 'https://api.parse.com/1/classes/chatterbox',
-      type: 'GET',
-      data: {
-        'limit': 1000,
-        'keys': 'roomname'
-      },
-      success : function(data) {
-        app.roomNames = _.groupBy(data.results, 'roomname');
-        $('#roomSelect').html('<option value="addRoom">...add a room</option>');
-        for (var room in app.roomNames) {
-          app.addRoom(room);
-        }
-        $('#roomSelect').val(app.currentRoom);
-      }
-    });
+  var app = this;
+  var data = {
+    limit: 1000,
+    keys: 'roomname'
+  };
+  var success = function(data) {
+    app.roomNames = _.groupBy(data.results, 'roomname');
+    $('#roomSelect').html('<option value="addRoom">...add a room</option>');
+    for (var room in app.roomNames) {
+      app.addRoom(room);
+    }
+    $('#roomSelect').val(app.currentRoom);
+  };
+
+  this.request('GET', data, success);
 };
 
 ChatterBox.prototype.clearMessages = function() {
