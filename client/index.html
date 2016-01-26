@@ -3,44 +3,64 @@
   <head>
     <meta charset="utf-8">
     <title>chatterbox</title>
-    <link rel="stylesheet" href="styles/styles.css">
-
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="styles/styles.css">
     <!-- dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser.js"></script>
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/underscore/underscore-min.js"></script>
     <script src="bower_components/moment/moment.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- your scripts -->
     <script src="env/config.js"></script>
     <script src="scripts/app.js"></script>
   </head>
   <body>
-    <div id="main">
-      <h1>chatterbox</h1>
-      <!-- Your HTML goes here! -->
-      <div>
-        <label for="roomSelect">room:</label>
-        <select id="roomSelect">
-          <option value="addRoom">...add a room</option>
-        </select>
-        <form id="add-room">
-          <input type="text" id="new-room">
-          <input type="submit" class="submit" value="Add Room">
-        </form>
+  <div class="container">
+      <!-- menu area -->
+      <div class="row">
+        <div class="col-sm-12">
+          <h1>chatterbox</h1>
+          <div>
+            <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select a Room<span class="caret"></span></button>
+            <ul class="dropdown-menu" id="roomSelect">
+            </ul>
+            </div>
+
+
+            <form id="add-room">
+              <input type="text" id="new-room">
+              <input type="submit" class="submit btn btn-success" value="Add Room">
+            </form>
+          </div>
+          <form id="send">
+            <input type="text" id="message">
+            <input type="submit" class="submit btn btn-primary" value="Post Comment">
+          </form>
+        </div>
       </div>
-      <div>
-        <label for="friendSelect">friends:</label>
-        <select id="friendSelect">
-          <option></option>
-        </select>
+      <!-- message area -->
+      <div class="row">
+        <!-- friends -->
+        <div class="col-sm-4">
+          <h3>Friends</h3>
+          <div id="friendSelect" class="btn-group-vertical" role="group">
+          </div>
+        </div>
+
+        <!-- message container -->
+        <div class="col-sm-8">
+          <!-- room/friends name -->
+          <h3 class="roomName"></h3>
+          <!-- messages -->
+          <div id="chats">
+            
+
+          </div>
+        </div>
       </div>
-      <form id="send">
-        <input type="text" id="message">
-        <input type="submit" class="submit" value="Post Comment">
-      </form>
     </div>
-    <div class="roomName">
-    </div>
-    <div id="chats"></div>
+  </div>
   </body>
 </html>

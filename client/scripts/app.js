@@ -45,10 +45,11 @@ ChatterBox.prototype.init = function() {
   });
 
   //select room whose message to view
-  $('#roomSelect').on('change', function() {
-    app.currentRoom = $(this).val();
+  $('#roomSelect').on('click', 'a', function() {
+    $('#friendSelect button').removeClass('btn-success').addClass('btn-default');
+    app.currentRoom = $(this).text();
     app.currentFriend = null;
-    if (app.currentRoom === 'addRoom') {
+    if (app.currentRoom === 'add a room') {
       $('#add-room').fadeIn();
     } else {
       $('.roomName').text("room: " + app.currentRoom);
@@ -57,9 +58,10 @@ ChatterBox.prototype.init = function() {
   });
 
   //select friend to view messages of
-  $('#friendSelect').on('change', function() {
-    app.currentFriend = $(this).val();
-    
+  $('#friendSelect').on('click', 'button', function() {
+    app.currentFriend = $(this).text();
+    $('#friendSelect button').removeClass('btn-success').addClass('btn-default');
+    $(this).removeClass('btn-default').addClass('btn-success');
     $('.roomName').text("friend: " + app.currentFriend);
     app.fetch();
   });
@@ -139,7 +141,7 @@ ChatterBox.prototype.fetchRooms = function() { //TO DO: Optimize fetch to only c
   };
   var success = function(data) {
     app.roomNames = _.groupBy(data.results, 'roomname');
-    $('#roomSelect').html('<option value="addRoom">...add a room</option>');
+    $('#roomSelect').html('<li><a href="#">add a room</a></li><li class="divider"></li>');
     for (var room in app.roomNames) {
       app.addRoom(room);
     }
@@ -154,39 +156,43 @@ ChatterBox.prototype.clearMessages = function() {
 };
 
 ChatterBox.prototype.addMessage = function(message) {
-  var $message = $('<div class="chat"></div>');
-  var $username = $('<span class="username"></span>');
-  var $messageText = $('<span class="text"></span>');
-  var $time = $('<span class="time"></span>');
+
+
+  var $message = $('<div class="panel panel-default chat"></div>');
+  var $username = $('<strong class="username text-primary"></strong>');
+  var $usernameLink = $('<a href="#"></a>').append($username);
+  var $messageText = $('<p class="text"></p>');
+  var $time = $('<span class="pull-right time small"></span>');
+
   $username.text(message.username);
   $messageText.text(message.text);
   if (message.username in this.friends) {
     $messageText.addClass('friended');
   }
   var timeText = moment(message.updatedAt, moment.ISO_8601).fromNow();
-  //console.log(timeText);
   $time.text(timeText);
-  $message.append($username).append($messageText).append($time);
+  //console.log(timeText);
+  $message.append($usernameLink).append($time).append($messageText);
   $('#chats').append($message);
 };
 
 ChatterBox.prototype.addRoom = function(roomName) {
-  var $option = $('<option></option>');
-  $option.text(roomName);
-  $option.val(roomName);
-  $('#roomSelect').append($option);
+  var $li = $('<li></li>');
+  var $a = $('<a href="#"></a>');
+  $a.text(roomName);
+  $li.append($a);
+  $('#roomSelect').append($li);
 };
 
 ChatterBox.prototype.addFriend = function(username) {
   if (!(username in this.friends)) {
     this.friends[username] = true;
   }
-  $('#friendSelect').html('<option></option>');
+  $('#friendSelect').html('');
   for (var friend in this.friends) {
-    var $option = $('<option></option>');
-    $option.text(friend);
-    $option.val(friend);
-    $('#friendSelect').append($option);
+    var $button = $('<button type="button" class="btn btn-default"></button>');
+    $button.text(friend);
+    $('#friendSelect').append($button);
   }
 };
 
