@@ -1,5 +1,18 @@
+
+.container {
+  max-width: 800px;
+  background-color: #efefef;
+}
+
 a:hover {
   text-decoration: none;
+}
+.btn-group-vertical {
+  max-width: 100%;
+}
+#friendSelect .btn {
+  max-width: 100%;
+  overflow: hidden;
 }
 .username {
     /*margin-right: 1em;*/
@@ -24,6 +37,7 @@ a:hover {
 .chat {
   padding: 0.5em;
   border-bottom: 1px solid #CCC;
+  word-wrap: break-word;
 }
 
 #add-room, .dropdown {

@@ -34,7 +34,7 @@ ChatterBox.prototype.init = function() {
     app.addNewRoom($('#new-room').val());
     $('#add-room').fadeOut();
     $('.roomName').text("room: " + app.currentRoom);
-
+    $('.submission').slideDown();
   });
 
   //submit new message to post to server
@@ -46,6 +46,7 @@ ChatterBox.prototype.init = function() {
 
   //select room whose message to view
   $('#roomSelect').on('click', 'a', function() {
+    $('.submission').slideDown();
     $('#friendSelect button').removeClass('btn-success').addClass('btn-default');
     app.currentRoom = $(this).text();
     app.currentFriend = null;
@@ -63,6 +64,7 @@ ChatterBox.prototype.init = function() {
     $('#friendSelect button').removeClass('btn-success').addClass('btn-default');
     $(this).removeClass('btn-default').addClass('btn-success');
     $('.roomName').text("friend: " + app.currentFriend);
+    $('.submission').slideUp();
     app.fetch();
   });
   
