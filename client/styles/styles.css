@@ -5,7 +5,7 @@ body {
     font-family: arial, sans-serif;
 }
 
-#main, #chats {
+#main, #chats, .roomName {
     width: 500px;
     margin: auto;
     text-align: left;
@@ -88,4 +88,12 @@ form input[type=text] {
 
 .spinner img {
     padding: 10px;
+}
+
+#main select {
+    max-width:70%;
+}
+.roomName {
+    margin-top: 1em;
+    font-size: 1.5em; 
 }

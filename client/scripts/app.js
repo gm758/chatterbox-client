@@ -12,6 +12,7 @@ window.getQueryVariable = function(variable)
 
 var ChatterBox = function(username) {
   this.friends = {};
+  this.currentFriend = null;
   this.username = username || 'anon';
   this.currentRoom = 'lobby';
   this.messages = [];
@@ -22,8 +23,8 @@ ChatterBox.prototype.init = function() {
   var app = this;
   // set up username click to add friend
   $('body').on('click', '.username', function() {
-    var friendName = $(this).text();
-    app.addFriend(friendName);
+    app.addFriend($(this).text());
+    
   });
 
   $('#send').on('submit', function(e) {
@@ -34,9 +35,10 @@ ChatterBox.prototype.init = function() {
 
   $('#roomSelect').on('change', function() {
     app.currentRoom = $(this).val();
+    $('.roomName').text(app.currentRoom);
     app.fetch();
   });
-
+  $('.roomName').text(app.currentRoom);
   this.fetch();
 };
 
@@ -57,20 +59,32 @@ ChatterBox.prototype.send = function(message) {
   });
 };
 
-ChatterBox.prototype.fetch = function(cb) { //TO DO: Optimize fetch to only call room data
+ChatterBox.prototype.fetch = function() { //TO DO: Optimize fetch to only call room data
+    this.fetchRooms();
     var app = this;
+    var where = {};
+    if (this.currentFriend) {
+      where.username = this.currentFriend;
+    }
+    if (this.currentRoom) {
+      where.roomname = this.currentRoom;
+    }
+
     $.ajax({
       url: 'https://api.parse.com/1/classes/chatterbox',
       type: 'GET',
-      data: {"order":"-updatedAt"},
+      data: {
+        "order":"-updatedAt",
+        'where': where
+      },
       success : function(data) {
         app.messages = data.results;
         app.rooms = _.groupBy(app.messages, 'roomname');
-        $('#roomSelect').html('');
-        for (var room in app.rooms) {
-          app.addRoom(room);
-        }
-        $('#roomSelect').val(app.currentRoom);
+        // $('#roomSelect').html('');
+        // for (var room in app.rooms) {
+        //   app.addRoom(room);
+        // }
+        // $('#roomSelect').val(app.currentRoom);
 
         app.clearMessages();
         var messagesInRoom = app.rooms[app.currentRoom];
@@ -78,6 +92,25 @@ ChatterBox.prototype.fetch = function(cb) { //TO DO: Optimize fetch to only call
           app.addMessage(message);
         });
 
+      }
+    });
+};
+
+ChatterBox.prototype.fetchRooms = function() { //TO DO: Optimize fetch to only call room data
+    var app = this;
+    $.ajax({
+      url: 'https://api.parse.com/1/classes/chatterbox',
+      type: 'GET',
+      data: {
+        'keys': 'roomname'
+      },
+      success : function(data) {
+        app.roomNames = _.groupBy(data.results, 'roomname');
+        $('#roomSelect').html('');
+        for (var room in app.roomNames) {
+          app.addRoom(room);
+        }
+        $('#roomSelect').val(app.currentRoom);
       }
     });
 };
@@ -110,6 +143,13 @@ ChatterBox.prototype.addRoom = function(roomName) {
 ChatterBox.prototype.addFriend = function(username) {
   if (!(username in this.friends)) {
     this.friends[username] = true;
+  }
+  $('#friendSelect').html('');
+  for (var friend in this.friends) {
+    var $option = $('<option></option>');
+    $option.text(friend);
+    $option.val(friend);
+    $('#friendSelect').append($option);
   }
 };
 
