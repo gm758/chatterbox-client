@@ -26,9 +26,10 @@ ChatterBox.prototype.init = function() {
     app.addFriend(friendName);
   });
 
-  $('#send .submit').off('submit').on('submit', function(event) {
-    event.preventDefault();
+  $('#send').on('submit', function(e) {
+    e.preventDefault();
     app.handleSubmit($('#message').val());
+    $('#message').val('');
   });
 
   $('#roomSelect').on('change', function() {
@@ -40,6 +41,7 @@ ChatterBox.prototype.init = function() {
 };
 
 ChatterBox.prototype.send = function(message) {
+  var app = this;
   $.ajax({
     url: 'https://api.parse.com/1/classes/chatterbox',
     type: 'POST',
@@ -47,6 +49,7 @@ ChatterBox.prototype.send = function(message) {
     contentType: 'application/json',
     success: function (data) {
       console.log('chatterbox: Message sent');
+      app.fetch();
     },
     error: function (data) {
       console.error('chatterbox: Failed to send message');
@@ -59,6 +62,7 @@ ChatterBox.prototype.fetch = function(cb) {
     $.ajax({
       url: 'https://api.parse.com/1/classes/chatterbox',
       type: 'GET',
+      data: {"order":"-updatedAt"},
       success : function(data) {
         app.messages = data.results;
         app.rooms = _.groupBy(app.messages, 'roomname');
@@ -66,11 +70,14 @@ ChatterBox.prototype.fetch = function(cb) {
         for (var room in app.rooms) {
           app.addRoom(room);
         }
+        $('#roomSelect').val(app.currentRoom);
+
         app.clearMessages();
         var messagesInRoom = app.rooms[app.currentRoom];
         _.each(messagesInRoom, function(message) {
           app.addMessage(message);
         });
+
       }
     });
 };
@@ -114,8 +121,20 @@ ChatterBox.prototype.handleSubmit = function(message) {
   this.send(messageObj);
 };
 
+
+
 $(document).ready(function() {
   window.app = new ChatterBox(getQueryVariable('username'));
   app.init();
 
 });
+
+
+
+
+
+
+
+
+
+
