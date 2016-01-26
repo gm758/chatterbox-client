@@ -68,6 +68,11 @@ form input[type=text] {
 .chat .username {
     font-weight: 800;
     margin-right: 1em;
+    cursor: pointer;
+    color: #0086b3;
+}
+.username:hover {
+    color:lightgreen;
 }
 
 .chat .time {
@@ -96,4 +101,7 @@ form input[type=text] {
 .roomName {
     margin-top: 1em;
     font-size: 1.5em; 
+}
+#add-room {
+    display: none;
 }

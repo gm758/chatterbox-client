@@ -20,15 +20,23 @@
       <!-- Your HTML goes here! -->
       <div>
         <label for="roomSelect">room:</label>
-        <select id="roomSelect"></select>
+        <select id="roomSelect">
+          <option value="addRoom">...add a room</option>
+        </select>
+        <form id="add-room">
+          <input type="text" id="new-room">
+          <input type="submit" class="submit" value="Add Room">
+        </form>
       </div>
       <div>
         <label for="friendSelect">friends:</label>
-        <select id="friendSelect"></select>
+        <select id="friendSelect">
+          <option></option>
+        </select>
       </div>
       <form id="send">
         <input type="text" id="message">
-        <input type="submit" class="submit">
+        <input type="submit" class="submit" value="Post Comment">
       </form>
     </div>
     <div class="roomName">

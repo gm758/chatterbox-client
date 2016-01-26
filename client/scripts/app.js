@@ -27,6 +27,14 @@ ChatterBox.prototype.init = function() {
     
   });
 
+  $('body').on('submit', '#add-room', function(e) {
+    e.preventDefault();
+    app.addNewRoom($('#new-room').val());
+    $('#add-room').fadeOut();
+    $('.roomName').text("room: " + app.currentRoom);
+
+  });
+
   $('#send').on('submit', function(e) {
     e.preventDefault();
     app.handleSubmit($('#message').val());
@@ -35,12 +43,29 @@ ChatterBox.prototype.init = function() {
 
   $('#roomSelect').on('change', function() {
     app.currentRoom = $(this).val();
-    $('.roomName').text(app.currentRoom);
-    app.fetch();
+    if (app.currentRoom === 'addRoom') {
+      $('#add-room').fadeIn();
+    } else {
+      $('.roomName').text("room: " + app.currentRoom);
+      app.fetch();
+    }
   });
-  $('.roomName').text(app.currentRoom);
+  
+
+  $('.roomName').text("room: " + app.currentRoom);
   this.fetch();
 };
+
+ChatterBox.prototype.addNewRoom = function(roomName) {
+  var welcomeMessage = {
+    username: 'chatterbox',
+    text: 'Welcome to ' + roomName,
+    roomname: roomName
+  };
+  this.currentRoom = roomName;
+  this.send(welcomeMessage);
+};
+
 
 ChatterBox.prototype.send = function(message) {
   var app = this;
@@ -80,12 +105,6 @@ ChatterBox.prototype.fetch = function() { //TO DO: Optimize fetch to only call r
       success : function(data) {
         app.messages = data.results;
         app.rooms = _.groupBy(app.messages, 'roomname');
-        // $('#roomSelect').html('');
-        // for (var room in app.rooms) {
-        //   app.addRoom(room);
-        // }
-        // $('#roomSelect').val(app.currentRoom);
-
         app.clearMessages();
         var messagesInRoom = app.rooms[app.currentRoom];
         _.each(messagesInRoom, function(message) {
@@ -102,11 +121,12 @@ ChatterBox.prototype.fetchRooms = function() { //TO DO: Optimize fetch to only c
       url: 'https://api.parse.com/1/classes/chatterbox',
       type: 'GET',
       data: {
+        'limit': 1000,
         'keys': 'roomname'
       },
       success : function(data) {
         app.roomNames = _.groupBy(data.results, 'roomname');
-        $('#roomSelect').html('');
+        $('#roomSelect').html('<option value="addRoom">...add a room</option>');
         for (var room in app.roomNames) {
           app.addRoom(room);
         }
@@ -144,7 +164,7 @@ ChatterBox.prototype.addFriend = function(username) {
   if (!(username in this.friends)) {
     this.friends[username] = true;
   }
-  $('#friendSelect').html('');
+  $('#friendSelect').html('<option></option>');
   for (var friend in this.friends) {
     var $option = $('<option></option>');
     $option.text(friend);
@@ -171,8 +191,6 @@ $(document).ready(function() {
   setInterval(app.fetch.bind(app), 5000);
 
 });
-
-
 
 
 
