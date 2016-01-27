@@ -11,10 +11,13 @@ window.getQueryVariable = function(variable)
   return false;
 };
 
+var tabTemplate = '';
+
 
 var ChatterBox = function(username) {
   this.friends = {};
   this.currentFriend = null;
+  this.mentioned = null;
   this.username = username || 'anon';
   this.currentRoom = 'lobby';
   this.messages = [];
@@ -26,6 +29,16 @@ ChatterBox.prototype.init = function() {
   $('body').on('click', '.username', function() {
     app.addFriend($(this).text());
     
+  });
+
+  //display mentions of clicked @tag
+  $('body').on('click', '.at-mention', function() {
+      app.mentioned = $(this).text().slice(1);
+      app.currentFriend = null;
+      $('#friendSelect button').removeClass('btn-success').addClass('btn-default');
+      $('.roomName').text("posts @ " + app.mentioned);
+      $('.submission').slideUp();
+      app.fetchMentions();
   });
 
   //submit new room for creation
@@ -109,6 +122,30 @@ ChatterBox.prototype.send = function(message) {
 
 };
 
+ChatterBox.prototype.fetchMentions = function() {
+  this.fetchRooms();
+  var app = this;
+
+  var data = {
+    "limit":1000,
+    "order":"-updatedAt"
+  };
+
+  var success = function(data) {
+    var mentions = _.filter(data.results, function(obj) {
+      var testString = '@'+app.mentioned;
+      return obj.text && obj.text.indexOf(testString) !== -1;
+    });
+    app.messages = mentions;
+    app.clearMessages();
+    _.each(app.messages, function(message) {
+      app.addMessage(message);
+    });   
+  };
+
+  this.request('GET', data, success);
+};
+
 ChatterBox.prototype.fetch = function() { //TO DO: Optimize fetch to only call room data
   this.fetchRooms();
   var app = this;
@@ -117,13 +154,14 @@ ChatterBox.prototype.fetch = function() { //TO DO: Optimize fetch to only call r
     where.username = this.currentFriend;
   } else if (this.currentRoom) {
     where.roomname = this.currentRoom;
-  }
+  } 
 
   var data = {
     "limit":1000,
     "order":"-updatedAt",
     'where': where
   };
+
   var success = function(data) {
     app.messages = data.results;
     app.clearMessages();
@@ -139,6 +177,7 @@ ChatterBox.prototype.fetchRooms = function() { //TO DO: Optimize fetch to only c
   var app = this;
   var data = {
     limit: 1000,
+    "order":"-updatedAt",
     keys: 'roomname'
   };
   var success = function(data) {
@@ -168,6 +207,8 @@ ChatterBox.prototype.addMessage = function(message) {
 
   $username.text(message.username);
   $messageText.text(message.text);
+  $messageText.html($messageText.html().replace(/(@\w+)/, '<a class="at-mention" href="#">$1</a>'));
+  
   if (message.username in this.friends) {
     $messageText.addClass('friended');
   }
@@ -210,10 +251,13 @@ ChatterBox.prototype.handleSubmit = function(message) {
 
 
 $(document).ready(function() {
+  tabTemplate = $('body').html();
   window.app = new ChatterBox(getQueryVariable('username'));
   app.init();
 
-  setInterval(app.fetch.bind(app), 5000);
+
+
+  // setInterval(app.fetch.bind(app), 5000);
 
 });
 
