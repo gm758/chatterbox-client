@@ -257,7 +257,7 @@ $(document).ready(function() {
 
 
 
-  // setInterval(app.fetch.bind(app), 5000);
+  setInterval(app.fetch.bind(app), 5000);
 
 });
 
