@@ -51,3 +51,10 @@ a:hover {
 #message {
   margin-bottom: 0.5em;
 }
+body.wait{
+    cursor: url(http://static.tumblr.com/qjv9goj/duUlzoulz/ajax-loader.gif), wait;
+}
+
+body.wait *{
+    cursor: inherit;
+}

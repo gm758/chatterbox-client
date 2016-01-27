@@ -172,12 +172,15 @@ ChatterBox.prototype.fetch = function() { //TO DO: Optimize fetch to only call r
     'where': where
   };
 
+  $('body').addClass('wait');
   var success = function(data) {
     app.messages = data.results;
     app.clearMessages();
     _.each(app.messages, function(message) {
       app.addMessage(message);
     });
+    
+    $('body').removeClass('wait');
   };
 
   this.request('GET', data, success);
@@ -264,7 +267,6 @@ $(document).ready(function() {
   tabTemplate = $('body').html();
   window.app = new ChatterBox(getQueryVariable('username'));
   app.init();
-
 
 
   setInterval(function() {
