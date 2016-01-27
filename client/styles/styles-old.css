@@ -115,5 +115,7 @@ form input[type=text] {
     display: none;
 }
 
-
+body.wait{
+    cursor: url(http://static.tumblr.com/qjv9goj/duUlzoulz/ajax-loader.gif), wait;
+}
 

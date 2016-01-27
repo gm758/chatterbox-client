@@ -21,10 +21,14 @@ var ChatterBox = function(username) {
   this.username = username || 'anon';
   this.currentRoom = 'lobby';
   this.messages = [];
+  this.refresh = this.fetch;
 };
 
 ChatterBox.prototype.init = function() {
   var app = this;
+
+  app.addFriend(app.username);
+
   // click friends names to add to friend list
   $('body').on('click', '.username', function() {
     app.addFriend($(this).text());
@@ -35,6 +39,7 @@ ChatterBox.prototype.init = function() {
   $('body').on('click', '.at-mention', function() {
       app.mentioned = $(this).text().slice(1);
       app.currentFriend = null;
+      app.refresh = app.fetchMentions;
       $('#friendSelect button').removeClass('btn-success').addClass('btn-default');
       $('.roomName').text("posts @ " + app.mentioned);
       $('.submission').slideUp();
@@ -59,6 +64,7 @@ ChatterBox.prototype.init = function() {
 
   //select room whose message to view
   $('#roomSelect').on('click', 'a', function() {
+    app.refresh = app.fetch;
     $('.submission').slideDown();
     $('#friendSelect button').removeClass('btn-success').addClass('btn-default');
     app.currentRoom = $(this).text();
@@ -74,6 +80,7 @@ ChatterBox.prototype.init = function() {
   //select friend to view messages of
   $('#friendSelect').on('click', 'button', function() {
     app.currentFriend = $(this).text();
+    app.refresh = app.fetch;
     $('#friendSelect button').removeClass('btn-success').addClass('btn-default');
     $(this).removeClass('btn-default').addClass('btn-success');
     $('.roomName').text("friend: " + app.currentFriend);
@@ -131,6 +138,8 @@ ChatterBox.prototype.fetchMentions = function() {
     "order":"-updatedAt"
   };
 
+  $('body').addClass('wait');
+
   var success = function(data) {
     var mentions = _.filter(data.results, function(obj) {
       var testString = '@'+app.mentioned;
@@ -140,7 +149,8 @@ ChatterBox.prototype.fetchMentions = function() {
     app.clearMessages();
     _.each(app.messages, function(message) {
       app.addMessage(message);
-    });   
+    });
+    $('body').removeClass('wait');
   };
 
   this.request('GET', data, success);
@@ -257,7 +267,9 @@ $(document).ready(function() {
 
 
 
-  setInterval(app.fetch.bind(app), 5000);
+  setInterval(function() {
+    app.refresh();
+  }, 5000);
 
 });
 
