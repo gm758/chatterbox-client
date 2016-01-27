@@ -11,9 +11,6 @@ window.getQueryVariable = function(variable)
   return false;
 };
 
-var tabTemplate = '';
-
-
 var ChatterBox = function(username) {
   this.friends = {};
   this.currentFriend = null;
@@ -22,6 +19,7 @@ var ChatterBox = function(username) {
   this.currentRoom = 'lobby';
   this.messages = [];
   this.refresh = this.fetch;
+  this.allUsers = [];
 };
 
 ChatterBox.prototype.init = function() {
@@ -84,6 +82,16 @@ ChatterBox.prototype.init = function() {
     $('#friendSelect button').removeClass('btn-success').addClass('btn-default');
     $(this).removeClass('btn-default').addClass('btn-success');
     $('.roomName').text("friend: " + app.currentFriend);
+    $('.submission').slideUp();
+    app.fetch();
+  });
+  
+   //select friend to view messages of
+  $('#users').on('click', 'a', function() {
+    app.currentFriend = $(this).text();
+    app.refresh = app.fetch;
+    $('#friendSelect button').removeClass('btn-success').addClass('btn-default');
+    $('.roomName').text("user: " + app.currentFriend);
     $('.submission').slideUp();
     app.fetch();
   });
@@ -174,12 +182,16 @@ ChatterBox.prototype.fetch = function() { //TO DO: Optimize fetch to only call r
 
   $('body').addClass('wait');
   var success = function(data) {
+    app.allUsers = [];
     app.messages = data.results;
     app.clearMessages();
     _.each(app.messages, function(message) {
       app.addMessage(message);
+      // var username = message.username;
+      // app.allUsers[username] = app.allUsers[username] || 0;
+      // app.allUsers[username]++;
     });
-    
+
     $('body').removeClass('wait');
   };
 
@@ -187,7 +199,9 @@ ChatterBox.prototype.fetch = function() { //TO DO: Optimize fetch to only call r
 };
 
 ChatterBox.prototype.fetchRooms = function() { //TO DO: Optimize fetch to only call room data
+
   var app = this;
+  app.fetchUsers();
   var data = {
     limit: 1000,
     "order":"-updatedAt",
@@ -204,6 +218,30 @@ ChatterBox.prototype.fetchRooms = function() { //TO DO: Optimize fetch to only c
 
   this.request('GET', data, success);
 };
+
+ChatterBox.prototype.fetchUsers = function() { //TO DO: Optimize fetch to only call room data
+  var app = this;
+  var data = {
+    limit: 1000,
+    "order":"-updatedAt",
+  };
+  var success = function(data) {
+    app.allUsers = Object.keys(_.groupBy(data.results, 'username'));
+    app.allUsers = app.allUsers.sort();
+    $('#users').html('');
+
+    for (var i = 0; i < app.allUsers.length; i++) {
+      var $li = $('<li></li>');
+      var $userlink = $('<a href="#"></a>');
+      $userlink.text(app.allUsers[i]);
+      $('#users').append($li).append($userlink);
+    
+    }
+  };
+
+  this.request('GET', data, success);
+};
+
 
 ChatterBox.prototype.clearMessages = function() {
   $('#chats').html('');
@@ -260,8 +298,6 @@ ChatterBox.prototype.handleSubmit = function(message) {
   };
   this.send(messageObj);
 };
-
-
 
 $(document).ready(function() {
   tabTemplate = $('body').html();

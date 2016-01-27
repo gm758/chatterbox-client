@@ -55,6 +55,11 @@ body.wait{
     cursor: url(http://static.tumblr.com/qjv9goj/duUlzoulz/ajax-loader.gif), wait;
 }
 
-body.wait *{
+body.wait * {
     cursor: inherit;
+}
+#users {
+  max-height: 500px;
+  overflow: auto;
+  padding: 0.5em;
 }
